@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master's Program Pathway Exploration - Ann Chang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Pastel Dream -->
+    <!-- Application Structure Plan: The application is designed as a narrative journey to guide the faculty through the student's decision-making process. It starts with an introduction ("The Crossroads"), moves to a timeline of the academic journey ("The Path So Far"), presents the core decision point with an interactive comparison of the two programs ("The Two Futures"), explains the underlying logic ("The Rationale"), and ends with a clear conclusion. This structure transforms a static proposal into a persuasive story, making the student's reasoning more compelling and easier to understand than a linear document. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Motivation & Academic History -> Goal: Show progression -> Viz: Interactive timeline cards (HTML/CSS/JS) -> Interaction: Hover to see details -> Justification: More engaging than a simple list.
+        - Report Info: Two Academic Plans Comparison -> Goal: Clearly contrast the two options -> Viz: Side-by-side layout with Bar Chart for timeline (Chart.js), Donut Charts for course focus (Chart.js), and dynamic, styled cards for course plans (HTML/JS) -> Interaction: Buttons to toggle between plans, updating charts and text -> Justification: Visualizations make complex data (timelines, course composition, course lists) instantly understandable and aesthetically pleasing.
+        - Report Info: Rationale (AI, career goals, life constraints) -> Goal: Present core arguments clearly -> Viz: Styled text blocks with icons (HTML/CSS Unicode) -> Interaction: None, focus on readability -> Justification: Clean, scannable presentation of supporting arguments.
+        - Library/Method: Chart.js for all charts (Canvas-based), Vanilla JS for all interactions, TailwindCSS for styling. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #FFF9F7; /* Pastel - Soft Peach White */
+            color: #6D605A; /* Pastel - Warm Grey */
+        }
+        h1, h2, h3, h4, .font-bold {
+             color: #4A423D; /* Pastel - Darker Warm Grey */
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            color: #A89B95;
+        }
+        .nav-button.active, .nav-button:hover {
+            color: #E5A898; /* Pastel - Coral */
+            border-bottom-color: #E5A898;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #F0E9E6;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px -2px rgba(109, 96, 90, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(109, 96, 90, 0.08);
+        }
+        .tag-deco {
+            background-color: #E6F0EB; /* Pastel - Lighter Mint */
+            color: #4A6C5B;
+        }
+        .tag-it {
+            background-color: #E8EEF3; /* Pastel - Lighter Blue */
+            color: #556270;
+        }
+        .btn-toggle {
+            transition: all 0.3s ease;
+        }
+        .btn-toggle.active {
+            background-color: #E5A898;
+            color: #FFFFFF;
+            box-shadow: 0 2px 4px rgba(229, 168, 152, 0.2);
+        }
+        .btn-toggle:not(.active) {
+             background-color: #F5F1EF;
+             color: #A89B95;
+        }
+        .btn-toggle:not(.active):hover {
+            background-color: #EFEAE7;
+        }
+        .text-pro { color: #4A6C5B; } /* Pastel Mint for Advantages */
+        .text-con { color: #D98B79; } /* Pastel Coral for Challenges */
+
+    </style>
+</head>
+<body class="antialiased">
+    <header class="sticky top-0 bg-white/90 backdrop-blur-md z-10 shadow-sm">
+        <nav class="container mx-auto px-6 py-3">
+            <ul class="flex justify-center space-x-6 md:space-x-8">
+                <li><a href="#journey" class="nav-button font-medium text-sm md:text-base border-b-2 border-transparent pb-1">My Journey</a></li>
+                <li><a href="#comparison" class="nav-button font-medium text-sm md:text-base border-b-2 border-transparent pb-1">Plan Comparison</a></li>
+                <li><a href="#rationale" class="nav-button font-medium text-sm md:text-base border-b-2 border-transparent pb-1">My Rationale</a></li>
+                <li><a href="#discussion" class="nav-button font-medium text-sm md:text-base border-b-2 border-transparent pb-1">Discussion Points</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <section class="text-center mb-20">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Master's Program Pathway Exploration</h1>
+            <p class="text-lg md:text-xl text-gray-600 mb-2">Ann Chang | 48170026</p>
+            <p class="text-md text-gray-500">A Discussion on the Master of IT vs. Master of Interaction Design, and Future Career Planning (UI/UX -> PM)</p>
+        </section>
+
+        <section id="journey" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-3">My Journey: From Tech Exploration to Design Awakening</h2>
+                <p class="max-w-3xl mx-auto text-gray-600">My path has been a gradual one of exploration. From a passion for content creation to a rekindled interest in technology, my studies in the Master of IT program ultimately led me to discover my true calling: human-centered interaction design. Here are the key steps in my academic journey so far.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="courses-grid">
+            </div>
+        </section>
+
+        <section id="comparison" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-3">The Crossroads: Two Potential Futures</h2>
+                <p class="max-w-3xl mx-auto text-gray-600">Standing at a career crossroads, I have carefully evaluated two possible paths: continuing with the Master of IT or transferring to the Master of Interaction Design. This interactive comparison aims to illustrate the differences between them to serve as a basis for our discussion.</p>
+            </div>
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-100/50">
+                <div class="flex justify-center mb-8 border border-gray-200/80 p-1 rounded-lg w-fit mx-auto">
+                    <button id="btn-mit" class="btn-toggle px-4 py-2 text-sm font-semibold rounded-md">Stay in Master of IT</button>
+                    <button id="btn-mides" class="btn-toggle px-4 py-2 text-sm font-semibold rounded-md">Switch to Master of ID</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+                    <div class="lg:col-span-3">
+                        <h3 class="text-xl font-bold text-center mb-4">Graduation Timeline Comparison</h3>
+                        <div class="chart-container">
+                            <canvas id="timelineChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <h3 class="text-xl font-bold text-center mb-4">Remaining Course Focus</h3>
+                        <div class="chart-container h-64 md:h-72">
+                            <canvas id="focusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="details-container" class="mt-12 transition-opacity duration-500">
+                </div>
+
+                <div class="mt-12">
+                    <h3 class="text-xl font-bold text-center mb-6">Future Academic Plan</h3>
+                    <div id="course-plan-container" class="transition-opacity duration-500 max-w-5xl mx-auto"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="rationale" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-3">My Rationale & Deliberations</h2>
+                <p class="max-w-3xl mx-auto text-gray-600">My hesitation is not without reason; it stems from a comprehensive consideration of my career goals, observations of industry trends, and my personal circumstances. The following points are the key factors I have been weighing.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card">
+                    <h3 class="font-bold text-xl mb-3 flex items-center">
+                        <span class="text-2xl mr-3">💡</span> Weighing Breadth vs. Depth
+                    </h3>
+                    <p class="text-gray-600">I am weighing the broad technical foundation of the MIT program against the specialized, hands-on learning in DECO courses, which aligns more closely with my UI/UX and future PM goals. Both are valuable, but I need to determine which is more critical for me.</p>
+                </div>
+                <div class="card">
+                    <h3 class="font-bold text-xl mb-3 flex items-center">
+                        <span class="text-2xl mr-3">🤖</span> Contemplating Future Value
+                    </h3>
+                    <p class="text-gray-600">Considering the rise of AI, I wonder if specializing in human-centered skills (like design thinking and empathy) is a more resilient long-term career investment. This is what I see as the core advantage of the MIDes program.</p>
+                </div>
+                <div class="card">
+                    <h3 class="font-bold text-xl mb-3 flex items-center">
+                        <span class="text-2xl mr-3">⚖️</span> Balancing Study and Reality
+                    </h3>
+                    <p class="text-gray-600">As a single mother, my study time is very limited, which forces me to be pragmatic. I'm concerned that the extensive theoretical learning in technical courses may offer less immediate, practical benefit for employment compared to more applied design skills.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="discussion" class="text-center scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-4">Discussion Points & Advice Sought</h2>
+            <div class="max-w-4xl mx-auto text-left">
+                <p class="text-gray-600 mb-8 text-center">Based on the above, I still have many questions and uncertainties. I would be very grateful to hear your professional opinion to help me make the most suitable decision. The main points I wish to discuss are:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card">
+                        <p class="font-semibold text-lg">1. Career Path Planning (UI/UX -> PM)</p>
+                        <p class="text-gray-700 mt-2">I am interested in a career path from UI/UX Designer to Product Manager (PM). Could you advise on the advantages and challenges each master's degree would present for this long-term goal? Is the user-centric mindset from ID or the technical feasibility assessment from IT a more critical starting point?</p>
+                    </div>
+                    <div class="card">
+                        <p class="font-semibold text-lg">2. Maximizing Learning Efficiency</p>
+                        <p class="text-gray-700 mt-2">Given my limited time, I want to maximize the benefit of every course. If I stay in IT, how would you suggest I build my design skills? If I switch to ID, what are the most critical technical skills I should focus on learning outside of class?</p>
+                    </div>
+                    <div class="card">
+                        <p class="font-semibold text-lg">3. Leveraging My Unique Background</p>
+                        <p class="text-gray-700 mt-2">My undergraduate degree in journalism has given me a sensitivity to content creation and storytelling. Do you think this could be a unique advantage in the UI/UX or PM fields? How can I best combine this experience with my current studies to create a distinctive profile?</p>
+                    </div>
+                     <div class="card">
+                        <p class="font-semibold text-lg">4. Questions on Job Market Realities</p>
+                        <p class="text-gray-700 mt-2">I have heard that some local UI/UX work in Australia is outsourced, which is a concern for me. Additionally, outside of corporate roles, are there potential career paths for Interaction Design in the public sector or academia? I would like a more pragmatic understanding of the overall employment landscape.</p>
+                    </div>
+                </div>
+                 <p class="mt-10 text-center text-gray-700">Thank you for your time and I look forward to our conversation.</p>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="mt-24 border-t border-gray-200/80">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+            <h3 class="text-lg font-semibold text-gray-600 mb-4">References</h3>
+            <ul class="text-sm space-y-1">
+                <li>Text Content: Ann Chang</li>
+                <li>Web Application & Design: Google Gemini</li>
+                <li>Libraries & Frameworks: Tailwind CSS, Chart.js</li>
+            </ul>
+            <p class="mt-6 text-xs">&copy; 2024 Ann Chang. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const cuteColors = {
+            blue: 'rgba(179, 198, 213, 0.8)', // #B3C6D5 Pastel Blue
+            green: 'rgba(167, 196, 181, 0.8)', // #A7C4B5 Pastel Mint
+            coral: 'rgba(229, 168, 152, 0.8)', // #E5A898
+            pink: 'rgba(242, 218, 213, 0.8)' // #F2DAD5
+        };
+
+        const academicData = {
+            courses: [
+                { semester: '2024 Sem 1', code: 'DECO7140', title: 'Introduction to Web Design', type: 'DECO', status: '7 (High Distinction)' },
+                { semester: '2024 Sem 1', code: 'INFS7900', title: 'Intro to Information Systems', type: 'IT', status: '5 (Credit)' },
+                { semester: '2024 Sem 2', code: 'DECO7180', title: 'Design Computing Studio 1', type: 'DECO', status: '6 (Distinction)' },
+                { semester: '2024 Sem 2', code: 'DECO7250', title: 'Human-Computer Interaction', type: 'DECO', status: '5 (Credit)' },
+                { semester: '2025 Sem 1', code: 'CSSE7030', title: 'Introduction to Programming', type: 'IT', status: 'In Progress' },
+                { semester: '2025 Sem 1', code: 'DECO7220', title: 'Information Visualisation', type: 'DECO', status: 'In Progress' },
+                { semester: '2025 Sem 1', code: 'DECO7380', title: 'Studio 3 - Proposal', type: 'DECO', status: 'In Progress' },
+                { semester: '2025 Sem 1', code: 'REIT6811', title: 'Research Methods', type: 'IT', status: 'In Progress' },
+            ],
+            plans: {
+                mit: {
+                    title: 'Stay in Master of IT',
+                    graduation: 'End of 2026',
+                    graduationValue: 2.0,
+                    focus: { design: 3, tech: 5 }, 
+                    advantages: 'In the job market, Master of IT has relatively more opportunities.',
+                    challenges: 'Technical aspects may not be learned in sufficient depth and may not be fully applicable to the job market.',
+                    color: cuteColors.blue,
+                    coursePlan: [
+                        { semester: '2025 Sem 2', courses: ['DECO7381 Studio 3 - Build', 'DECO6500 Adv. HCI', 'DECO3500 Social & Mobile Comp.', 'INFS7903 Relational Database Systems'] },
+                        { semester: '2026 Sem 1', courses: ['CSSE7023 Adv. Software Eng.', 'INFS7202 Web Information Systems'] },
+                        { semester: '2026 Sem 2', courses: ['COMP3702 Artificial Intelligence', 'MATH7861 Discrete Mathematics'] }
+                    ]
+                },
+                mides: {
+                    title: 'Switch to Master of ID',
+                    graduation: 'Mid-2026',
+                    graduationValue: 1.5,
+                    advantages: 'The degree and skillset perfectly match UI/UX career goals.',
+                    challenges: 'Coding skills may be insufficient, requiring extra time for self-study.',
+                    focus: { design: 6, tech: 1 },
+                    color: cuteColors.green,
+                    coursePlan: [
+                        { semester: '2025 Sem 2', courses: ['DECO7381 Studio 3 - Build', 'DECO6500 Adv. HCI', 'DECO3500 Social & Mobile Comp.', 'DECO7230 Digital Prototyping & XR'] },
+                        { semester: '2026 Sem 1', courses: ['DECO7385 Physical Computing Studio', 'DECO7110 Design Thinking', 'INFS7202 Web Information Systems'] }
+                    ]
+                }
+            }
+        };
+        
+        const coursesGrid = document.getElementById('courses-grid');
+
+        function getStatusClass(status) {
+            if (status.includes('7')) return 'text-purple-600 font-bold';
+            if (status.includes('6')) return 'text-blue-600 font-semibold';
+            if (status.includes('5')) return 'text-green-600 font-medium';
+            if (status.includes('In Progress')) return 'text-orange-500';
+            return 'text-gray-500';
+        }
+
+        academicData.courses.forEach(course => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            const statusClass = getStatusClass(course.status);
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-sm font-semibold ${course.type === 'DECO' ? 'tag-deco' : 'tag-it'} px-2 py-1 rounded-full">${course.type}</span>
+                    <span class="text-sm text-gray-400">${course.semester}</span>
+                </div>
+                <h4 class="font-bold text-lg">${course.code}</h4>
+                <p class="text-sm text-gray-500 mb-2">${course.title}</p>
+                <p class="text-sm ${statusClass}">${course.status}</p>
+            `;
+            coursesGrid.appendChild(card);
+        });
+
+        const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+        const timelineChart = new Chart(timelineCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Graduation Timeline'],
+                datasets: [
+                    {
+                        label: 'Stay in Master of IT (until end of 2026)',
+                        data: [2.0],
+                        backgroundColor: academicData.plans.mit.color,
+                        borderColor: academicData.plans.mit.color.replace('0.8', '1'),
+                        borderWidth: 1,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.5
+                    },
+                    {
+                        label: 'Switch to Master of ID (until mid-2026)',
+                        data: [1.5],
+                        backgroundColor: academicData.plans.mides.color,
+                        borderColor: academicData.plans.mides.color.replace('0.8', '1'),
+                        borderWidth: 1,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.5
+                    }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 2.5,
+                        title: { display: true, text: 'Years from now (shorter is sooner)' }
+                    },
+                    y: { display: false }
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ' + context.formattedValue + ' years';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const focusCtx = document.getElementById('focusChart').getContext('2d');
+        const focusChart = new Chart(focusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Design-Oriented Courses', 'Tech-Oriented Courses'],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [cuteColors.green, cuteColors.blue],
+                    borderColor: ['#FFF9F7'],
+                    borderWidth: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ' + context.raw + ' courses';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        const btnMit = document.getElementById('btn-mit');
+        const btnMides = document.getElementById('btn-mides');
+        const detailsContainer = document.getElementById('details-container');
+        const coursePlanContainer = document.getElementById('course-plan-container');
+
+        function updateDetails(planKey) {
+            const plan = academicData.plans[planKey];
+            focusChart.data.datasets[0].data = [plan.focus.design, plan.focus.tech];
+            focusChart.update();
+            
+            detailsContainer.style.opacity = 0;
+            coursePlanContainer.style.opacity = 0;
+
+            setTimeout(() => {
+                detailsContainer.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-center md:text-left">
+                    <div>
+                        <h4 class="font-bold text-lg text-pro mb-2">Advantages (Pros)</h4>
+                        <p class="text-gray-600">${plan.advantages}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg text-con mb-2">Challenges (Cons)</h4>
+                        <p class="text-gray-600">${plan.challenges}</p>
+                    </div>
+                </div>
+                `;
+                
+                let coursePlanHtml = `<div class="grid grid-cols-1 ${plan.coursePlan.length > 2 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-6">`;
+                plan.coursePlan.forEach(semester => {
+                    coursePlanHtml += `
+                        <div class="bg-white/70 p-5 rounded-xl border border-gray-200/50">
+                            <p class="font-bold text-lg mb-3">${semester.semester}</p>
+                            <ul class="space-y-2">
+                    `;
+                    semester.courses.forEach(course => {
+                        const isDeco = course.toLowerCase().includes('deco');
+                        coursePlanHtml += `
+                            <li class="flex items-center text-gray-700 text-sm">
+                                <span class="w-2.5 h-2.5 mr-3 rounded-full ${isDeco ? 'bg-[#A7C4B5]' : 'bg-[#B3C6D5]'}"></span>
+                                ${course}
+                            </li>`;
+                    });
+                    coursePlanHtml += '</ul></div>';
+                });
+                coursePlanHtml += '</div>';
+                coursePlanContainer.innerHTML = coursePlanHtml;
+                
+                detailsContainer.style.opacity = 1;
+                coursePlanContainer.style.opacity = 1;
+            }, 300);
+
+            if (planKey === 'mit') {
+                btnMit.classList.add('active');
+                btnMides.classList.remove('active');
+            } else {
+                btnMides.classList.add('active');
+                btnMit.classList.remove('active');
+            }
+        }
+        
+        btnMit.addEventListener('click', () => updateDetails('mit'));
+        btnMides.addEventListener('click', () => updateDetails('mides'));
+
+        updateDetails('mides');
+
+        const navLinks = document.querySelectorAll('nav a');
+        const sections = document.querySelectorAll('main section');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        const linkHref = link.getAttribute('href');
+                        link.classList.toggle('active', linkHref === `#${entry.target.id}`);
+                    });
+                }
+            });
+        }, { rootMargin: "-40% 0px -60% 0px", threshold: 0.3 });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+        
+    });
+</script>
+
+</body>
+</html>
